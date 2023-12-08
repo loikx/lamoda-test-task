@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"sync"
 
 	"github.com/gofrs/uuid"
 	"github.com/jackc/pgx/v5"
@@ -9,9 +10,14 @@ import (
 
 type ProductRepository struct {
 	conn *pgx.Conn
+
+	mu sync.Mutex
 }
 
 func (r *ProductRepository) Reserve(ctx context.Context, ids []uuid.UUID) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
 	_, err := r.conn.Exec(
 		ctx,
 		"update product set is_reserved=true where id=any($1)",
@@ -22,6 +28,9 @@ func (r *ProductRepository) Reserve(ctx context.Context, ids []uuid.UUID) error 
 }
 
 func (r *ProductRepository) Release(ctx context.Context, ids []uuid.UUID) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
 	_, err := r.conn.Exec(
 		ctx,
 		"update product set is_reserved=false where id=any($1)",
