@@ -1,4 +1,4 @@
-package fridge
+package app
 
 import (
 	"context"
