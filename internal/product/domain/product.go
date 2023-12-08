@@ -7,18 +7,20 @@ import (
 )
 
 type Product struct {
-	ID    uuid.UUID `json:"id"`
-	Name  string    `json:"name"`
-	Count int       `json:"count"`
-	Size  pkg.Size  `json:"size"`
+	ID         uuid.UUID `json:"id"`
+	Name       string    `json:"name"`
+	Count      int       `json:"count"`
+	Size       pkg.Size  `json:"size"`
+	IsReserved bool      `json:"is_reserved"`
 }
 
-func NewProduct(ID uuid.UUID, name string, count int, size pkg.Size) *Product {
+func NewProduct(ID uuid.UUID, name string, count int, size pkg.Size, isReserved bool) *Product {
 	return &Product{
-		ID:    ID,
-		Name:  name,
-		Count: count,
-		Size:  size,
+		ID:         ID,
+		Name:       name,
+		Count:      count,
+		Size:       size,
+		IsReserved: isReserved,
 	}
 }
 
