@@ -14,6 +14,13 @@ type ProductRepository struct {
 	mu sync.Mutex
 }
 
+func NewProductRepository(conn *pgx.Conn) *ProductRepository {
+	return &ProductRepository{
+		conn: conn,
+		mu:   sync.Mutex{},
+	}
+}
+
 func (r *ProductRepository) Reserve(ctx context.Context, ids []uuid.UUID) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()

@@ -15,6 +15,13 @@ type WareHouseRepository struct {
 	mu sync.Mutex
 }
 
+func NewWareHouseRepository(con *pgx.Conn) *WareHouseRepository {
+	return &WareHouseRepository{
+		con: con,
+		mu:  sync.Mutex{},
+	}
+}
+
 func (r *WareHouseRepository) FindByID(ctx context.Context, id uuid.UUID) ([]domain.Product, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
