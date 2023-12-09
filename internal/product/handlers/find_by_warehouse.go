@@ -11,10 +11,10 @@ import (
 )
 
 type FindByWarehouseHandler struct {
-	useCase *usecases.FindByWareHouseUseCase
+	useCase *usecases.FindByWarehouseUseCase
 }
 
-func NewFindByWarehouseHandler(useCase *usecases.FindByWareHouseUseCase) *FindByWarehouseHandler {
+func NewFindByWarehouseHandler(useCase *usecases.FindByWarehouseUseCase) *FindByWarehouseHandler {
 	return &FindByWarehouseHandler{useCase: useCase}
 }
 

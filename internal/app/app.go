@@ -44,7 +44,7 @@ type App struct {
 
 	releaseUseCase         *usecases.ReleaseUseCase
 	reserveUseCase         *usecases.ReserveUseCase
-	findByWarehouseUseCase *usecases.FindByWareHouseUseCase
+	findByWarehouseUseCase *usecases.FindByWarehouseUseCase
 
 	productsRepository *repository.ProductRepository
 }

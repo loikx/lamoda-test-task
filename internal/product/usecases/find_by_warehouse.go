@@ -12,15 +12,15 @@ type FindByWarehouseResponse struct {
 	Count int              `json:"count"`
 }
 
-type FindByWareHouseUseCase struct {
+type FindByWarehouseUseCase struct {
 	products domain.ProductRepository
 }
 
-func NewFindByWarehouseUseCase(products domain.ProductRepository) *FindByWareHouseUseCase {
-	return &FindByWareHouseUseCase{products: products}
+func NewFindByWarehouseUseCase(products domain.ProductRepository) *FindByWarehouseUseCase {
+	return &FindByWarehouseUseCase{products: products}
 }
 
-func (useCase *FindByWareHouseUseCase) Handle(ctx context.Context, id uuid.UUID) (*FindByWarehouseResponse, error) {
+func (useCase *FindByWarehouseUseCase) Handle(ctx context.Context, id uuid.UUID) (*FindByWarehouseResponse, error) {
 	products, err := useCase.products.FindByWarehouse(ctx, id)
 	if err != nil {
 		return nil, err
