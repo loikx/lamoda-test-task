@@ -21,4 +21,4 @@ services:
     env_file:
       - ./configs/env.yaml
     ports:
-      - "8000:8001"
+      - "8081:8080"

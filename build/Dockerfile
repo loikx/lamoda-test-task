@@ -14,4 +14,4 @@ COPY "./cmd" "./cmd"
 
 RUN go build -o ./cmd ./cmd
 
-CMD ["./cmd"]
+CMD ["./cmd/cmd"]
