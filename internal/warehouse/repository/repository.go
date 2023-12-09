@@ -28,12 +28,32 @@ func (r *WareHouseRepository) FindByID(ctx context.Context, id uuid.UUID) ([]dom
 
 	var items []domain.Product
 
-	err := r.con.QueryRow(
+	rows, err := r.con.Query(
 		ctx,
 		"select * from product.product p where exists(select 1 from product.warehouse w where w.id = p.warehouse_id and not p.is_reserved)",
-	).Scan(&items)
+	)
 	if err != nil {
 		return nil, err
+	}
+
+	for rows.Next() {
+		var product domain.Product
+		err = rows.Scan(
+			&product.ID,
+			&product.Name,
+			&product.Count,
+			&product.Size.Length,
+			&product.Size.Width,
+			&product.Size.Height,
+			&product.Size.Unit,
+			&product.WarehouseID,
+			&product.IsReserved,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		items = append(items, product)
 	}
 
 	return items, nil
