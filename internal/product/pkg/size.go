@@ -1,9 +1,7 @@
 package pkg
 
 import (
-	"context"
-
-	"github.com/muonsoft/validation"
+	"fmt"
 )
 
 type Unit string
@@ -15,20 +13,18 @@ type Size struct {
 	Unit   Unit    `json:"unit"`
 }
 
-func (s *Size) Validate(ctx context.Context, validator *validation.Validator) error {
-	return validator.Validate(
-		ctx,
-		validation.AtProperty(
-			"length",
-			validation.Check(s.Length > 0),
-		),
-		validation.AtProperty(
-			"width",
-			validation.Check(s.Width > 0),
-		),
-		validation.AtProperty(
-			"height",
-			validation.Check(s.Height > 0),
-		),
-	)
+func (s *Size) Validate() error {
+	if s.Length <= 0 {
+		return fmt.Errorf("size: length must be more than 0")
+	}
+
+	if s.Width <= 0 {
+		return fmt.Errorf("size: width must be more than 0")
+	}
+
+	if s.Height <= 0 {
+		return fmt.Errorf("size: height must be more than 0")
+	}
+
+	return nil
 }

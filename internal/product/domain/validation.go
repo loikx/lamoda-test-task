@@ -1,30 +1,17 @@
 package domain
 
 import (
-	"context"
-
-	"github.com/muonsoft/validation"
-	"github.com/muonsoft/validation/it"
+	"fmt"
 )
 
-func (p *Product) Validate(ctx context.Context, validator *validation.Validator) error {
-	return validator.Validate(
-		ctx,
-		validation.StringProperty(
-			"name",
-			p.Name,
-			it.HasLengthBetween(2, 100),
-		),
-		validation.CountableProperty(
-			"count",
-			p.Count,
-			it.HasMaxCount(1000),
-		),
-		validation.ValidProperty(
-			"size",
-			validation.ValidatableFunc(func(ctx context.Context, validator *validation.Validator) error {
-				return p.Size.Validate(ctx, validator)
-			}),
-		),
-	)
+func (p *Product) Validate() error {
+	if len(p.Name) < 2 || len(p.Name) > 100 {
+		return fmt.Errorf("product: validation length must be between 2-100")
+	}
+
+	if p.Count > 1000 {
+		return fmt.Errorf("product: validation product count must be lower than 1000")
+	}
+
+	return p.Size.Validate()
 }

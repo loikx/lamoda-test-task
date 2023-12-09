@@ -1,19 +1,13 @@
 package domain
 
 import (
-	"context"
-
-	"github.com/muonsoft/validation"
-	"github.com/muonsoft/validation/it"
+	"fmt"
 )
 
-func (w *Warehouse) Validation(ctx context.Context, validator *validation.Validator) error {
-	return validator.Validate(
-		ctx,
-		validation.StringProperty(
-			"name",
-			w.Name,
-			it.HasLengthBetween(2, 100),
-		),
-	)
+func (w *Warehouse) Validation() error {
+	if len(w.Name) < 2 || len(w.Name) > 100 {
+		return fmt.Errorf("warehouse: name length must be between 2-100")
+	}
+
+	return nil
 }

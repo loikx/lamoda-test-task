@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"sync"
 
 	"github.com/gofrs/uuid"
 	"github.com/jackc/pgx/v5"
@@ -11,20 +10,16 @@ import (
 
 type WareHouseRepository struct {
 	con *pgx.Conn
-
-	mu sync.Mutex
 }
 
 func NewWareHouseRepository(con *pgx.Conn) *WareHouseRepository {
 	return &WareHouseRepository{
 		con: con,
-		mu:  sync.Mutex{},
 	}
 }
 
 func (r *WareHouseRepository) FindByID(ctx context.Context, id uuid.UUID) ([]domain.Product, error) {
-	r.mu.Lock()
-	defer r.mu.Unlock()
+	// TODO: перенести в product
 
 	var items []domain.Product
 
