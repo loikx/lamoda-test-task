@@ -77,23 +77,14 @@ func (r *ProductRepository) Release(ctx context.Context, ids []uuid.UUID) error 
 func (r *ProductRepository) FindByWarehouse(ctx context.Context, id uuid.UUID) ([]domain.Product, error) {
 	var items []domain.Product
 
-	tx, err := r.conn.Begin(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("product: find by warehouse fail start transaction %w", err)
-	}
-
-	rows, err := tx.Query(
+	rows, err := r.conn.Query(
 		ctx,
 		"select * from product.product p "+
 			"where ($1)=p.warehouse_id and not p.is_reserved",
 		id,
 	)
 	if err != nil {
-		if err = tx.Rollback(ctx); err != nil {
-			return nil, fmt.Errorf("product: find by warehouse rollback fail %w", err)
-		}
-
-		return nil, fmt.Errorf("product: find by warehouse fail %w", err)
+		return nil, fmt.Errorf("product: find by warehouse %w", err)
 	}
 
 	if !rows.Next() {
