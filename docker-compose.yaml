@@ -6,7 +6,7 @@ services:
     container_name: product-database
     restart: always
     ports:
-      - "5432:5433"
+      - "6432:5432"
     environment:
       - POSTGRES_DB=product
       - POSTGRES_USER=admin
