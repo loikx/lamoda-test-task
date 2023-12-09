@@ -7,6 +7,7 @@ import (
 	"github.com/lamoda-tech/loikx/internal/product/domain"
 	"github.com/lamoda-tech/loikx/internal/product/dto"
 	"github.com/lamoda-tech/loikx/internal/product/usecases"
+	"github.com/lamoda-tech/loikx/pkg/errors"
 )
 
 type JsonCreateResponse struct {
@@ -24,10 +25,11 @@ func NewCreateProductHandler(useCase *usecases.CreateProductUseCase) *CreateProd
 func (handler *CreateProductHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	var createCommandDto dto.CreateCommandDto
 	if err := json.NewDecoder(request.Body).Decode(&createCommandDto); err != nil {
+		customError := errors.NewError(err)
+		marshaledError, _ := json.Marshal(customError)
+
 		writer.WriteHeader(http.StatusBadRequest)
-		writer.Write(
-			[]byte(err.Error()),
-		)
+		writer.Write(marshaledError)
 		return
 	}
 

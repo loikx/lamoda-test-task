@@ -1,11 +1,13 @@
 package handlers
 
 import (
-	"github.com/gofrs/uuid"
-	"github.com/gorilla/mux"
+	"encoding/json"
 	"net/http"
 
+	"github.com/gofrs/uuid"
+	"github.com/gorilla/mux"
 	"github.com/lamoda-tech/loikx/internal/warehouse/usecases"
+	"github.com/lamoda-tech/loikx/pkg/errors"
 )
 
 type DeleteWarehouseHandler struct {
@@ -25,10 +27,11 @@ func (handler *DeleteWarehouseHandler) ServeHTTP(writer http.ResponseWriter, req
 
 	uuidID, err := uuid.FromString(id)
 	if err != nil {
+		customError := errors.NewError(err)
+		marshaledError, _ := json.Marshal(customError)
+
 		writer.WriteHeader(http.StatusBadRequest)
-		writer.Write(
-			[]byte(err.Error()),
-		)
+		writer.Write(marshaledError)
 		return
 	}
 

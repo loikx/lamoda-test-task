@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"github.com/lamoda-tech/loikx/pkg/errors"
 	"net/http"
 
 	"github.com/lamoda-tech/loikx/internal/product/dto"
@@ -19,10 +20,11 @@ func NewReserveProductHandler(useCase *usecases.ReserveUseCase) *ReserveProductH
 func (handler *ReserveProductHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	var reserveDto dto.ReserveDto
 	if err := json.NewDecoder(request.Body).Decode(&reserveDto); err != nil {
+		customError := errors.NewError(err)
+		marshaledError, _ := json.Marshal(customError)
+
 		writer.WriteHeader(http.StatusBadRequest)
-		writer.Write(
-			[]byte(err.Error()),
-		)
+		writer.Write(marshaledError)
 		return
 	}
 

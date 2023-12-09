@@ -7,6 +7,7 @@ import (
 	"github.com/lamoda-tech/loikx/internal/warehouse/domain"
 	"github.com/lamoda-tech/loikx/internal/warehouse/dto"
 	"github.com/lamoda-tech/loikx/internal/warehouse/usecases"
+	"github.com/lamoda-tech/loikx/pkg/errors"
 )
 
 type JsonCreateResponse struct {
@@ -24,10 +25,11 @@ func NewCreateWarehouseHandler(useCase *usecases.CreateWarehouseUseCase) *Create
 func (handler *CreateWarehouseHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	var createDto dto.CreateCommandDto
 	if err := json.NewDecoder(request.Body).Decode(&createDto); err != nil {
+		customError := errors.NewError(err)
+		marshaledError, _ := json.Marshal(customError)
+
 		writer.WriteHeader(http.StatusBadRequest)
-		writer.Write(
-			[]byte(err.Error()),
-		)
+		writer.Write(marshaledError)
 		return
 	}
 

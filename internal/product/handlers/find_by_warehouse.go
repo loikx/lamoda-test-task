@@ -2,13 +2,13 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/gofrs/uuid"
 	"github.com/gorilla/mux"
 	"github.com/lamoda-tech/loikx/internal/product/domain"
 	"github.com/lamoda-tech/loikx/internal/product/usecases"
+	"github.com/lamoda-tech/loikx/pkg/errors"
 )
 
 type JsonFindByWarehouseResponse struct {
@@ -33,10 +33,11 @@ func (handler *FindByWarehouseHandler) ServeHTTP(writer http.ResponseWriter, req
 
 	uuidID, err := uuid.FromString(id)
 	if err != nil {
+		customError := errors.NewError(err)
+		marshaledError, _ := json.Marshal(customError)
+
 		writer.WriteHeader(http.StatusBadRequest)
-		writer.Write(
-			[]byte(fmt.Sprintf("warehouse: id is invalid %s", id)),
-		)
+		writer.Write(marshaledError)
 		return
 	}
 
