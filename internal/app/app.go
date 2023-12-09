@@ -46,12 +46,16 @@ type App struct {
 	releaseHandler         *handlers.ReleaseProductHandler
 	reserveHandler         *handlers.ReserveProductHandler
 	findByWarehouseHandler *handlers.FindByWarehouseHandler
+	createProductHandler   *handlers.CreateProductHandler
+	deleteProductHandler   *handlers.DeleteProductHandler
 	createWarehouseHandler *handlers2.CreateWarehouseHandler
 	deleteWarehouseHandler *handlers2.DeleteWarehouseHandler
 
 	releaseUseCase         *usecases.ReleaseUseCase
 	reserveUseCase         *usecases.ReserveUseCase
 	findByWarehouseUseCase *usecases.FindByWarehouseUseCase
+	createProductUseCase   *usecases.CreateProductUseCase
+	deleteProductUseCase   *usecases.DeleteProductUseCase
 	createWarehouseUseCase *usecases2.CreateWarehouseUseCase
 	deleteWarehouseUseCase *usecases2.DeleteWarehouseUseCase
 
@@ -98,12 +102,16 @@ func (a *App) initServer(ctx context.Context, logger *log.Logger) error {
 	a.releaseUseCase = usecases.NewReleaseUseCase(a.productsRepository)
 	a.reserveUseCase = usecases.NewReserveUseCase(a.productsRepository)
 	a.findByWarehouseUseCase = usecases.NewFindByWarehouseUseCase(a.productsRepository)
+	a.createProductUseCase = usecases.NewCreateProductUseCase(a.productsRepository)
+	a.deleteProductUseCase = usecases.NewDeleteProductUseCase(a.productsRepository)
 	a.createWarehouseUseCase = usecases2.NewCreateWarehouseUseCase(a.warehouseRepository)
 	a.deleteWarehouseUseCase = usecases2.NewDeleteWarehouseUseCase(a.warehouseRepository)
 
 	a.releaseHandler = handlers.NewReleaseProductHandler(a.releaseUseCase)
 	a.reserveHandler = handlers.NewReserveProductHandler(a.reserveUseCase)
 	a.findByWarehouseHandler = handlers.NewFindByWarehouseHandler(a.findByWarehouseUseCase)
+	a.createProductHandler = handlers.NewCreateProductHandler(a.createProductUseCase)
+	a.deleteProductHandler = handlers.NewDeleteProductHandler(a.deleteProductUseCase)
 	a.createWarehouseHandler = handlers2.NewCreateWarehouseHandler(a.createWarehouseUseCase)
 	a.deleteWarehouseHandler = handlers2.NewDeleteWarehouseHandler(a.deleteWarehouseUseCase)
 
@@ -122,12 +130,14 @@ func (a *App) initServer(ctx context.Context, logger *log.Logger) error {
 func (a *App) createRouter() http.Handler {
 	router := mux.NewRouter()
 
-	router.Handle("/api/products/reserve", a.reserveHandler).Methods(http.MethodPost)
-	router.Handle("/api/products/release", a.releaseHandler).Methods(http.MethodPost)
+	router.Handle("/api/products/reserve", a.reserveHandler).Methods(http.MethodPatch)
+	router.Handle("/api/products/release", a.releaseHandler).Methods(http.MethodPatch)
 	router.Handle("/api/products/find-by-warehouse/{id}", a.findByWarehouseHandler).Methods(http.MethodGet)
+	router.Handle("/api/products/create", a.createProductHandler).Methods(http.MethodPost)
+	router.Handle("/api/products/delete/{id}", a.deleteProductHandler).Methods(http.MethodDelete)
 
 	router.Handle("/api/warehouse/create", a.createWarehouseHandler).Methods(http.MethodPost)
-	router.Handle("/api/warehouse/delete", a.deleteWarehouseHandler).Methods(http.MethodPost)
+	router.Handle("/api/warehouse/delete/{id}", a.deleteWarehouseHandler).Methods(http.MethodDelete)
 
 	return router
 }

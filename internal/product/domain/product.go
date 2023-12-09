@@ -15,14 +15,14 @@ type Product struct {
 	IsReserved  bool      `json:"is_reserved"`
 }
 
-func NewProduct(name string, count int, size pkg.Size, warehouseID uuid.UUID, isReserved bool) *Product {
+func NewProduct(name string, count int, size pkg.Size, warehouseID uuid.UUID) *Product {
 	return &Product{
 		ID:          uuid.Must(uuid.NewV7()),
 		Name:        name,
 		Count:       count,
 		Size:        size,
 		WarehouseID: warehouseID,
-		IsReserved:  isReserved,
+		IsReserved:  false,
 	}
 }
 

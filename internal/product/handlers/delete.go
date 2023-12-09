@@ -1,22 +1,22 @@
 package handlers
 
 import (
-	"github.com/gofrs/uuid"
-	"github.com/gorilla/mux"
 	"net/http"
 
-	"github.com/lamoda-tech/loikx/internal/warehouse/usecases"
+	"github.com/gofrs/uuid"
+	"github.com/gorilla/mux"
+	"github.com/lamoda-tech/loikx/internal/product/usecases"
 )
 
-type DeleteWarehouseHandler struct {
-	useCase *usecases.DeleteWarehouseUseCase
+type DeleteProductHandler struct {
+	useCase *usecases.DeleteProductUseCase
 }
 
-func NewDeleteWarehouseHandler(useCase *usecases.DeleteWarehouseUseCase) *DeleteWarehouseHandler {
-	return &DeleteWarehouseHandler{useCase: useCase}
+func NewDeleteProductHandler(useCase *usecases.DeleteProductUseCase) *DeleteProductHandler {
+	return &DeleteProductHandler{useCase: useCase}
 }
 
-func (handler *DeleteWarehouseHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+func (handler *DeleteProductHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	id, ok := mux.Vars(request)["id"]
 	if !ok {
 		writer.WriteHeader(http.StatusBadRequest)

@@ -6,10 +6,6 @@ import (
 	"github.com/lamoda-tech/loikx/internal/warehouse/domain"
 )
 
-type DeleteWarehouseCommand struct {
-	ID uuid.UUID
-}
-
 type DeleteWarehouseUseCase struct {
 	warehouse domain.WarehouseRepository
 }
@@ -18,6 +14,6 @@ func NewDeleteWarehouseUseCase(warehouse domain.WarehouseRepository) *DeleteWare
 	return &DeleteWarehouseUseCase{warehouse: warehouse}
 }
 
-func (useCase *DeleteWarehouseUseCase) Handle(ctx context.Context, command DeleteWarehouseCommand) error {
-	return useCase.warehouse.Delete(ctx, command.ID)
+func (useCase *DeleteWarehouseUseCase) Handle(ctx context.Context, id uuid.UUID) error {
+	return useCase.warehouse.Delete(ctx, id)
 }

@@ -117,3 +117,60 @@ func (r *ProductRepository) FindByWarehouse(ctx context.Context, id uuid.UUID) (
 
 	return items, nil
 }
+
+func (r *ProductRepository) Save(ctx context.Context, product *domain.Product) error {
+	tx, err := r.conn.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("product: save start transaction fail %w", err)
+	}
+
+	_, err = tx.Exec(
+		ctx,
+		"insert into product.product(id, name, count, length, width, height, unit, warehouse_id, is_reserved) "+
+			"values ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+		product.ID, product.Name, product.Count,
+		product.Size.Length, product.Size.Width, product.Size.Height, product.Size.Unit,
+		product.WarehouseID, product.IsReserved,
+	)
+	if err != nil {
+		if err = tx.Rollback(ctx); err != nil {
+			return fmt.Errorf("product: save rollback fail %w", err)
+		}
+
+		return fmt.Errorf("product: save fail %w", err)
+	}
+
+	err = tx.Commit(ctx)
+	if err != nil {
+		return fmt.Errorf("product: save commit fail %w", err)
+	}
+
+	return nil
+}
+
+func (r *ProductRepository) Delete(ctx context.Context, id uuid.UUID) error {
+	tx, err := r.conn.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("product: delete start transaction fail %w", err)
+	}
+
+	_, err = tx.Exec(
+		ctx,
+		"delete from product.product where id=($1)",
+		id,
+	)
+	if err != nil {
+		if err = tx.Rollback(ctx); err != nil {
+			return fmt.Errorf("product: delete rollback fail %w", err)
+		}
+
+		return fmt.Errorf("product: delete fail %w", err)
+	}
+
+	err = tx.Commit(ctx)
+	if err != nil {
+		return fmt.Errorf("product: delete commit fail %w", err)
+	}
+
+	return nil
+}
