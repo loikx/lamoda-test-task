@@ -4,9 +4,14 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/lamoda-tech/loikx/internal/warehouse/domain"
 	"github.com/lamoda-tech/loikx/internal/warehouse/dto"
 	"github.com/lamoda-tech/loikx/internal/warehouse/usecases"
 )
+
+type JsonCreateResponse struct {
+	Warehouse *domain.Warehouse `json:"data,omitempty"`
+}
 
 type CreateWarehouseHandler struct {
 	useCase *usecases.CreateWarehouseUseCase
@@ -36,12 +41,16 @@ func (handler *CreateWarehouseHandler) ServeHTTP(writer http.ResponseWriter, req
 		return
 	}
 
-	warehouseMarshaled, err := json.Marshal(warehouse)
+	response := JsonCreateResponse{
+		Warehouse: warehouse,
+	}
+
+	marshaledResponse, err := json.Marshal(response)
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	writer.WriteHeader(http.StatusOK)
-	writer.Write(warehouseMarshaled)
+	writer.Write(marshaledResponse)
 }
