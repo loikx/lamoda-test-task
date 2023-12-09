@@ -6,8 +6,8 @@ import (
 )
 
 type CreateCommandDto struct {
-	Name        string
-	Count       int
-	Size        pkg.Size
-	WarehouseID uuid.UUID
+	Name        string    `json:"name"`
+	Count       int       `json:"count"`
+	Size        pkg.Size  `json:"size"`
+	WarehouseID uuid.UUID `json:"warehouse"`
 }
