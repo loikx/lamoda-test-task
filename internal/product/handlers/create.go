@@ -2,10 +2,16 @@ package handlers
 
 import (
 	"encoding/json"
+	"net/http"
+
+	"github.com/lamoda-tech/loikx/internal/product/domain"
 	"github.com/lamoda-tech/loikx/internal/product/dto"
 	"github.com/lamoda-tech/loikx/internal/product/usecases"
-	"net/http"
 )
+
+type JsonCreateResponse struct {
+	Product *domain.Product `json:"data"`
+}
 
 type CreateProductHandler struct {
 	useCase *usecases.CreateProductUseCase
@@ -37,12 +43,16 @@ func (handler *CreateProductHandler) ServeHTTP(writer http.ResponseWriter, reque
 		return
 	}
 
-	marshaledProduct, err := json.Marshal(product)
+	response := JsonCreateResponse{
+		Product: product,
+	}
+
+	marshaledResponse, err := json.Marshal(response)
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	writer.WriteHeader(http.StatusOK)
-	writer.Write(marshaledProduct)
+	writer.Write(marshaledResponse)
 }

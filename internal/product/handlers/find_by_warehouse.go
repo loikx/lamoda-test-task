@@ -7,8 +7,14 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/gorilla/mux"
+	"github.com/lamoda-tech/loikx/internal/product/domain"
 	"github.com/lamoda-tech/loikx/internal/product/usecases"
 )
+
+type JsonFindByWarehouseResponse struct {
+	Items []*domain.Product `json:"data"`
+	Count int               `json:"count"`
+}
 
 type FindByWarehouseHandler struct {
 	useCase *usecases.FindByWarehouseUseCase
@@ -40,12 +46,17 @@ func (handler *FindByWarehouseHandler) ServeHTTP(writer http.ResponseWriter, req
 		return
 	}
 
-	body, err := json.Marshal(products)
+	response := JsonFindByWarehouseResponse{
+		Items: products.Items,
+		Count: products.Count,
+	}
+
+	marshaledResponse, err := json.Marshal(response)
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	writer.WriteHeader(http.StatusOK)
-	writer.Write(body)
+	writer.Write(marshaledResponse)
 }

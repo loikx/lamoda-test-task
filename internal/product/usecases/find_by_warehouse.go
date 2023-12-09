@@ -8,8 +8,8 @@ import (
 )
 
 type FindByWarehouseResponse struct {
-	Items []domain.Product `json:"items"`
-	Count int              `json:"count"`
+	Items []*domain.Product `json:"items"`
+	Count int               `json:"count"`
 }
 
 type FindByWarehouseUseCase struct {

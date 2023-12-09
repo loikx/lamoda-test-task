@@ -74,8 +74,8 @@ func (r *ProductRepository) Release(ctx context.Context, ids []uuid.UUID) error 
 	return nil
 }
 
-func (r *ProductRepository) FindByWarehouse(ctx context.Context, id uuid.UUID) ([]domain.Product, error) {
-	var items []domain.Product
+func (r *ProductRepository) FindByWarehouse(ctx context.Context, id uuid.UUID) ([]*domain.Product, error) {
+	var items []*domain.Product
 
 	rows, err := r.conn.Query(
 		ctx,
@@ -112,7 +112,7 @@ func (r *ProductRepository) FindByWarehouse(ctx context.Context, id uuid.UUID) (
 			return nil, fmt.Errorf("product: find by warehouse failed to scan product %w", err)
 		}
 
-		items = append(items, product)
+		items = append(items, &product)
 	}
 
 	return items, nil
