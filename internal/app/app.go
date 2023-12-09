@@ -112,6 +112,10 @@ func (a *App) initServer(ctx context.Context, logger *log.Logger) error {
 func (a *App) createRouter() http.Handler {
 	router := mux.NewRouter()
 
+	router.Handle("/api/products/reserve", a.reserveHandler).Methods(http.MethodPost)
+	router.Handle("/api/products/release", a.releaseHandler).Methods(http.MethodPost)
+	router.Handle("/api/warehouse/find-by-id/{id}", a.findByIDHandler).Methods(http.MethodGet)
+
 	return router
 }
 

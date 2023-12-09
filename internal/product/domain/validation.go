@@ -20,5 +20,11 @@ func (p *Product) Validate(ctx context.Context, validator *validation.Validator)
 			p.Count,
 			it.HasMaxCount(1000),
 		),
+		validation.ValidProperty(
+			"size",
+			validation.ValidatableFunc(func(ctx context.Context, validator *validation.Validator) error {
+				return p.Size.Validate(ctx, validator)
+			}),
+		),
 	)
 }
