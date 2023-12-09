@@ -20,6 +20,9 @@ func (handler *ReserveProductHandler) ServeHTTP(writer http.ResponseWriter, requ
 	var reserveDto dto.ReserveDto
 	if err := json.NewDecoder(request.Body).Decode(&reserveDto); err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
+		writer.Write(
+			[]byte(err.Error()),
+		)
 		return
 	}
 

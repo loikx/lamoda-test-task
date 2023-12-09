@@ -12,9 +12,14 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/jackc/pgx/v5"
 	"github.com/lamoda-tech/loikx/internal/config"
+	"github.com/lamoda-tech/loikx/internal/product/domain"
 	"github.com/lamoda-tech/loikx/internal/product/handlers"
 	"github.com/lamoda-tech/loikx/internal/product/repository"
 	"github.com/lamoda-tech/loikx/internal/product/usecases"
+	domain2 "github.com/lamoda-tech/loikx/internal/warehouse/domain"
+	handlers2 "github.com/lamoda-tech/loikx/internal/warehouse/handlers"
+	repository2 "github.com/lamoda-tech/loikx/internal/warehouse/repository"
+	usecases2 "github.com/lamoda-tech/loikx/internal/warehouse/usecases"
 	"github.com/lamoda-tech/loikx/pkg/server"
 )
 
@@ -41,12 +46,17 @@ type App struct {
 	releaseHandler         *handlers.ReleaseProductHandler
 	reserveHandler         *handlers.ReserveProductHandler
 	findByWarehouseHandler *handlers.FindByWarehouseHandler
+	createWarehouseHandler *handlers2.CreateWarehouseHandler
+	deleteWarehouseHandler *handlers2.DeleteWarehouseHandler
 
 	releaseUseCase         *usecases.ReleaseUseCase
 	reserveUseCase         *usecases.ReserveUseCase
 	findByWarehouseUseCase *usecases.FindByWarehouseUseCase
+	createWarehouseUseCase *usecases2.CreateWarehouseUseCase
+	deleteWarehouseUseCase *usecases2.DeleteWarehouseUseCase
 
-	productsRepository *repository.ProductRepository
+	productsRepository  domain.ProductRepository
+	warehouseRepository domain2.WarehouseRepository
 }
 
 func NewApp() *App {
@@ -83,14 +93,19 @@ func (a *App) initServer(ctx context.Context, logger *log.Logger) error {
 	}
 
 	a.productsRepository = repository.NewProductRepository(a.connection)
+	a.warehouseRepository = repository2.NewWarehouseRepository(a.connection)
 
 	a.releaseUseCase = usecases.NewReleaseUseCase(a.productsRepository)
 	a.reserveUseCase = usecases.NewReserveUseCase(a.productsRepository)
 	a.findByWarehouseUseCase = usecases.NewFindByWarehouseUseCase(a.productsRepository)
+	a.createWarehouseUseCase = usecases2.NewCreateWarehouseUseCase(a.warehouseRepository)
+	a.deleteWarehouseUseCase = usecases2.NewDeleteWarehouseUseCase(a.warehouseRepository)
 
 	a.releaseHandler = handlers.NewReleaseProductHandler(a.releaseUseCase)
 	a.reserveHandler = handlers.NewReserveProductHandler(a.reserveUseCase)
 	a.findByWarehouseHandler = handlers.NewFindByWarehouseHandler(a.findByWarehouseUseCase)
+	a.createWarehouseHandler = handlers2.NewCreateWarehouseHandler(a.createWarehouseUseCase)
+	a.deleteWarehouseHandler = handlers2.NewDeleteWarehouseHandler(a.deleteWarehouseUseCase)
 
 	router := a.createRouter()
 	nextRequestID := func() string {
@@ -110,6 +125,9 @@ func (a *App) createRouter() http.Handler {
 	router.Handle("/api/products/reserve", a.reserveHandler).Methods(http.MethodPost)
 	router.Handle("/api/products/release", a.releaseHandler).Methods(http.MethodPost)
 	router.Handle("/api/products/find-by-warehouse/{id}", a.findByWarehouseHandler).Methods(http.MethodGet)
+
+	router.Handle("/api/warehouse/create", a.createWarehouseHandler).Methods(http.MethodPost)
+	router.Handle("/api/warehouse/delete", a.deleteWarehouseHandler).Methods(http.MethodPost)
 
 	return router
 }

@@ -20,6 +20,9 @@ func (handler *ReleaseProductHandler) ServeHTTP(writer http.ResponseWriter, requ
 	var releaseDto dto.ReleaseDto
 	if err := json.NewDecoder(request.Body).Decode(&releaseDto); err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
+		writer.Write(
+			[]byte(err.Error()),
+		)
 		return
 	}
 
