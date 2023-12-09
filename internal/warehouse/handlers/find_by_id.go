@@ -19,16 +19,22 @@ func NewFindByIDHandler(useCase *usecases.FindByIDUseCase) *FindByIDHandler {
 }
 
 func (handler *FindByIDHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	id, err := uuid.FromString(mux.Vars(request)["id"])
+	id, ok := mux.Vars(request)["id"]
+	if !ok {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	uuidID, err := uuid.FromString(id)
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
 		writer.Write(
-			[]byte(fmt.Sprintf("warehouse: id is invalid %s", id.String())),
+			[]byte(fmt.Sprintf("warehouse: id is invalid %s", id)),
 		)
 		return
 	}
 
-	products, err := handler.useCase.Handle(request.Context(), id)
+	products, err := handler.useCase.Handle(request.Context(), uuidID)
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusInternalServerError)
 		return
