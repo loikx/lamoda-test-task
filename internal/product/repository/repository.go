@@ -2,8 +2,8 @@ package repository
 
 import (
 	"context"
-	"errors"
 	"fmt"
+	"log"
 
 	"github.com/gofrs/uuid"
 	"github.com/jackc/pgx/v5"
@@ -87,14 +87,6 @@ func (r *ProductRepository) FindByWarehouse(ctx context.Context, id uuid.UUID) (
 		return nil, fmt.Errorf("product: find by warehouse %w", err)
 	}
 
-	if !rows.Next() {
-		if rows.Err() == nil {
-			return nil, errors.New("product: find by warehouse empty")
-		}
-
-		return nil, rows.Err()
-	}
-
 	for rows.Next() {
 		var product domain.Product
 		err = rows.Scan(
@@ -112,7 +104,12 @@ func (r *ProductRepository) FindByWarehouse(ctx context.Context, id uuid.UUID) (
 			return nil, fmt.Errorf("product: find by warehouse failed to scan product %w", err)
 		}
 
+		log.Println(product)
 		items = append(items, &product)
+	}
+
+	if len(items) == 0 {
+		return nil, fmt.Errorf("product: find by warehouse result are empty")
 	}
 
 	return items, nil

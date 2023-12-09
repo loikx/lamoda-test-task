@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/gofrs/uuid"
@@ -43,9 +44,12 @@ func (handler *FindByWarehouseHandler) ServeHTTP(writer http.ResponseWriter, req
 
 	products, err := handler.useCase.Handle(request.Context(), uuidID)
 	if err != nil {
-		http.Error(writer, err.Error(), http.StatusInternalServerError)
+		log.Println(err)
+		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	log.Println(products.Count)
 
 	response := JsonFindByWarehouseResponse{
 		Items: products.Items,
@@ -54,7 +58,7 @@ func (handler *FindByWarehouseHandler) ServeHTTP(writer http.ResponseWriter, req
 
 	marshaledResponse, err := json.Marshal(response)
 	if err != nil {
-		http.Error(writer, err.Error(), http.StatusInternalServerError)
+		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
