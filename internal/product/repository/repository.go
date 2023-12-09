@@ -2,10 +2,12 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/gofrs/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/lamoda-tech/loikx/internal/product/domain"
 )
 
 type ProductRepository struct {
@@ -46,12 +48,81 @@ func (r *ProductRepository) Reserve(ctx context.Context, ids []uuid.UUID) error 
 }
 
 func (r *ProductRepository) Release(ctx context.Context, ids []uuid.UUID) error {
-	_, err := r.conn.Exec(
+	tx, err := r.conn.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("product: release fail start transaction %w", err)
+	}
+
+	_, err = tx.Exec(
 		ctx,
 		"update product.product set is_reserved=false "+
 			"where id=any($1) and warehouse_id=any(select id from product.warehouse where availability=true)",
 		ids,
 	)
+	if err != nil {
+		if err = tx.Rollback(ctx); err != nil {
+			return fmt.Errorf("product: release rollback fail %w", err)
+		}
 
-	return err
+		return fmt.Errorf("product: release fail %w", err)
+	}
+
+	if err = tx.Commit(ctx); err != nil {
+		return fmt.Errorf("product: release fail commit %w", err)
+	}
+
+	return nil
+}
+
+func (r *ProductRepository) FindByWarehouse(ctx context.Context, id uuid.UUID) ([]domain.Product, error) {
+	var items []domain.Product
+
+	tx, err := r.conn.Begin(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("product: find by warehouse fail start transaction %w", err)
+	}
+
+	rows, err := tx.Query(
+		ctx,
+		"select * from product.product p "+
+			"where ($1)=p.warehouse_id and not p.is_reserved",
+		id,
+	)
+	if err != nil {
+		if err = tx.Rollback(ctx); err != nil {
+			return nil, fmt.Errorf("product: find by warehouse rollback fail %w", err)
+		}
+
+		return nil, fmt.Errorf("product: find by warehouse fail %w", err)
+	}
+
+	if !rows.Next() {
+		if rows.Err() == nil {
+			return nil, errors.New("product: find by warehouse empty")
+		}
+
+		return nil, rows.Err()
+	}
+
+	for rows.Next() {
+		var product domain.Product
+		err = rows.Scan(
+			&product.ID,
+			&product.Name,
+			&product.Count,
+			&product.Size.Length,
+			&product.Size.Width,
+			&product.Size.Height,
+			&product.Size.Unit,
+			&product.WarehouseID,
+			&product.IsReserved,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("product: find by warehouse failed to scan product %w", err)
+		}
+
+		items = append(items, product)
+	}
+
+	return items, nil
 }

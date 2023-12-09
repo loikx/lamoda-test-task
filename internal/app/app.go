@@ -15,9 +15,6 @@ import (
 	"github.com/lamoda-tech/loikx/internal/product/handlers"
 	"github.com/lamoda-tech/loikx/internal/product/repository"
 	"github.com/lamoda-tech/loikx/internal/product/usecases"
-	handlers2 "github.com/lamoda-tech/loikx/internal/warehouse/handlers"
-	repository2 "github.com/lamoda-tech/loikx/internal/warehouse/repository"
-	usecases2 "github.com/lamoda-tech/loikx/internal/warehouse/usecases"
 	"github.com/lamoda-tech/loikx/pkg/server"
 )
 
@@ -41,16 +38,15 @@ type App struct {
 
 	connection *pgx.Conn
 
-	releaseHandler  *handlers.ReleaseProductHandler
-	reserveHandler  *handlers.ReserveProductHandler
-	findByIDHandler *handlers2.FindByIDHandler
+	releaseHandler         *handlers.ReleaseProductHandler
+	reserveHandler         *handlers.ReserveProductHandler
+	findByWarehouseHandler *handlers.FindByWarehouseHandler
 
-	releaseUseCase  *usecases.ReleaseUseCase
-	reserveUseCase  *usecases.ReserveUseCase
-	findByIDUseCase *usecases2.FindByIDUseCase
+	releaseUseCase         *usecases.ReleaseUseCase
+	reserveUseCase         *usecases.ReserveUseCase
+	findByWarehouseUseCase *usecases.FindByWareHouseUseCase
 
-	productsRepository  *repository.ProductRepository
-	warehouseRepository *repository2.WareHouseRepository
+	productsRepository *repository.ProductRepository
 }
 
 func NewApp() *App {
@@ -87,15 +83,14 @@ func (a *App) initServer(ctx context.Context, logger *log.Logger) error {
 	}
 
 	a.productsRepository = repository.NewProductRepository(a.connection)
-	a.warehouseRepository = repository2.NewWareHouseRepository(a.connection)
 
 	a.releaseUseCase = usecases.NewReleaseUseCase(a.productsRepository)
 	a.reserveUseCase = usecases.NewReserveUseCase(a.productsRepository)
-	a.findByIDUseCase = usecases2.NewFindByIDUseCase(a.warehouseRepository)
+	a.findByWarehouseUseCase = usecases.NewFindByWarehouseUseCase(a.productsRepository)
 
 	a.releaseHandler = handlers.NewReleaseProductHandler(a.releaseUseCase)
 	a.reserveHandler = handlers.NewReserveProductHandler(a.reserveUseCase)
-	a.findByIDHandler = handlers2.NewFindByIDHandler(a.findByIDUseCase)
+	a.findByWarehouseHandler = handlers.NewFindByWarehouseHandler(a.findByWarehouseUseCase)
 
 	router := a.createRouter()
 	nextRequestID := func() string {
@@ -114,7 +109,7 @@ func (a *App) createRouter() http.Handler {
 
 	router.Handle("/api/products/reserve", a.reserveHandler).Methods(http.MethodPost)
 	router.Handle("/api/products/release", a.releaseHandler).Methods(http.MethodPost)
-	router.Handle("/api/warehouse/find-by-id/{id}", a.findByIDHandler).Methods(http.MethodGet)
+	router.Handle("/api/products/find-by-warehouse/{id}", a.findByWarehouseHandler).Methods(http.MethodGet)
 
 	return router
 }

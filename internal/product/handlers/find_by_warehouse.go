@@ -7,18 +7,18 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/gorilla/mux"
-	"github.com/lamoda-tech/loikx/internal/warehouse/usecases"
+	"github.com/lamoda-tech/loikx/internal/product/usecases"
 )
 
-type FindByIDHandler struct {
-	useCase *usecases.FindByIDUseCase
+type FindByWarehouseHandler struct {
+	useCase *usecases.FindByWareHouseUseCase
 }
 
-func NewFindByIDHandler(useCase *usecases.FindByIDUseCase) *FindByIDHandler {
-	return &FindByIDHandler{useCase: useCase}
+func NewFindByWarehouseHandler(useCase *usecases.FindByWareHouseUseCase) *FindByWarehouseHandler {
+	return &FindByWarehouseHandler{useCase: useCase}
 }
 
-func (handler *FindByIDHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+func (handler *FindByWarehouseHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	id, ok := mux.Vars(request)["id"]
 	if !ok {
 		writer.WriteHeader(http.StatusBadRequest)
