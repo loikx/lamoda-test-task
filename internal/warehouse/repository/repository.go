@@ -30,7 +30,8 @@ func (r *WareHouseRepository) FindByID(ctx context.Context, id uuid.UUID) ([]dom
 
 	rows, err := r.con.Query(
 		ctx,
-		"select * from product.product p where exists(select 1 from product.warehouse w where w.id = p.warehouse_id and not p.is_reserved)",
+		"select * from product.product p "+
+			"where exists(select 1 from product.warehouse w where w.id = p.warehouse_id and not p.is_reserved)",
 	)
 	if err != nil {
 		return nil, err
