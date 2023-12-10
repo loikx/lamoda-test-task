@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/gofrs/uuid"
 	"github.com/jackc/pgx/v5"
@@ -104,7 +103,6 @@ func (r *ProductRepository) FindByWarehouse(ctx context.Context, id uuid.UUID) (
 			return nil, fmt.Errorf("product: find by warehouse failed to scan product %w", err)
 		}
 
-		log.Println(product)
 		items = append(items, &product)
 	}
 

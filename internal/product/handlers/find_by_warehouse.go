@@ -49,8 +49,6 @@ func (handler *FindByWarehouseHandler) ServeHTTP(writer http.ResponseWriter, req
 		return
 	}
 
-	log.Println(products.Count)
-
 	response := JsonFindByWarehouseResponse{
 		Items: products.Items,
 		Count: products.Count,
