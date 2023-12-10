@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/gofrs/uuid"
@@ -21,7 +22,11 @@ func NewDeleteWarehouseHandler(useCase *usecases.DeleteWarehouseUseCase) *Delete
 func (handler *DeleteWarehouseHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	id, ok := mux.Vars(request)["id"]
 	if !ok {
+		customError := errors.NewError(fmt.Errorf("request must be /api/warehouse/delete/{id}"))
+		marshaledError, _ := json.Marshal(customError)
+
 		writer.WriteHeader(http.StatusBadRequest)
+		writer.Write(marshaledError)
 		return
 	}
 
@@ -37,7 +42,11 @@ func (handler *DeleteWarehouseHandler) ServeHTTP(writer http.ResponseWriter, req
 
 	err = handler.useCase.Handle(request.Context(), uuidID)
 	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
+		customError := errors.NewError(err)
+		marshaledError, _ := json.Marshal(customError)
+
+		writer.WriteHeader(http.StatusInternalServerError)
+		writer.Write(marshaledError)
 		return
 	}
 

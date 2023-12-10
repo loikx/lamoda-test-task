@@ -56,7 +56,7 @@ func (r *WarehouseRepository) Delete(ctx context.Context, id uuid.UUID) error {
 		id,
 	)
 	if err != nil {
-		if err = tx.Rollback(ctx); err != nil {
+		if err := tx.Rollback(ctx); err != nil {
 			return fmt.Errorf("warehouse: delete rollback transaction fail %w", err)
 		}
 

@@ -32,7 +32,11 @@ func (handler *ReserveProductHandler) ServeHTTP(writer http.ResponseWriter, requ
 	command.IDs = reserveDto.IDs
 
 	if err := handler.useCase.Handle(request.Context(), command); err != nil {
+		customError := errors.NewError(err)
+		marshaledError, _ := json.Marshal(customError)
+
 		writer.WriteHeader(http.StatusInternalServerError)
+		writer.Write(marshaledError)
 		return
 	}
 

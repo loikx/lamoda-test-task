@@ -59,7 +59,7 @@ func (r *ProductRepository) Release(ctx context.Context, ids []uuid.UUID) error 
 		ids,
 	)
 	if err != nil {
-		if err = tx.Rollback(ctx); err != nil {
+		if err := tx.Rollback(ctx); err != nil {
 			return fmt.Errorf("product: release rollback fail %w", err)
 		}
 
@@ -128,7 +128,7 @@ func (r *ProductRepository) Save(ctx context.Context, product *domain.Product) e
 		product.WarehouseID, product.IsReserved,
 	)
 	if err != nil {
-		if err = tx.Rollback(ctx); err != nil {
+		if err := tx.Rollback(ctx); err != nil {
 			return fmt.Errorf("product: save rollback fail %w", err)
 		}
 
@@ -155,7 +155,7 @@ func (r *ProductRepository) Delete(ctx context.Context, id uuid.UUID) error {
 		id,
 	)
 	if err != nil {
-		if err = tx.Rollback(ctx); err != nil {
+		if err := tx.Rollback(ctx); err != nil {
 			return fmt.Errorf("product: delete rollback fail %w", err)
 		}
 

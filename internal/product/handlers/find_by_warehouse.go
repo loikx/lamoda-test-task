@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/gofrs/uuid"
@@ -44,8 +43,11 @@ func (handler *FindByWarehouseHandler) ServeHTTP(writer http.ResponseWriter, req
 
 	products, err := handler.useCase.Handle(request.Context(), uuidID)
 	if err != nil {
-		log.Println(err)
+		customError := errors.NewError(err)
+		marshaledError, _ := json.Marshal(customError)
+
 		writer.WriteHeader(http.StatusInternalServerError)
+		writer.Write(marshaledError)
 		return
 	}
 
@@ -56,7 +58,11 @@ func (handler *FindByWarehouseHandler) ServeHTTP(writer http.ResponseWriter, req
 
 	marshaledResponse, err := json.Marshal(response)
 	if err != nil {
+		customError := errors.NewError(err)
+		marshaledError, _ := json.Marshal(customError)
+
 		writer.WriteHeader(http.StatusInternalServerError)
+		writer.Write(marshaledError)
 		return
 	}
 

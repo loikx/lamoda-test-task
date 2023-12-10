@@ -1,6 +1,9 @@
 package handlers
 
 import (
+	"encoding/json"
+	"fmt"
+	"github.com/lamoda-tech/loikx/pkg/errors"
 	"net/http"
 
 	"github.com/gofrs/uuid"
@@ -19,16 +22,21 @@ func NewDeleteProductHandler(useCase *usecases.DeleteProductUseCase) *DeleteProd
 func (handler *DeleteProductHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	id, ok := mux.Vars(request)["id"]
 	if !ok {
+		customError := errors.NewError(fmt.Errorf("request must be /api/products/delete/{id}"))
+		marshaledError, _ := json.Marshal(customError)
+
 		writer.WriteHeader(http.StatusBadRequest)
+		writer.Write(marshaledError)
 		return
 	}
 
 	uuidID, err := uuid.FromString(id)
 	if err != nil {
+		customError := errors.NewError(err)
+		marshaledError, _ := json.Marshal(customError)
+
 		writer.WriteHeader(http.StatusBadRequest)
-		writer.Write(
-			[]byte(err.Error()),
-		)
+		writer.Write(marshaledError)
 		return
 	}
 

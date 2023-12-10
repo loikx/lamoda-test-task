@@ -39,7 +39,11 @@ func (handler *CreateWarehouseHandler) ServeHTTP(writer http.ResponseWriter, req
 
 	warehouse, err := handler.useCase.Handle(request.Context(), command)
 	if err != nil {
+		customError := errors.NewError(err)
+		marshaledError, _ := json.Marshal(customError)
+
 		writer.WriteHeader(http.StatusInternalServerError)
+		writer.Write(marshaledError)
 		return
 	}
 
